@@ -108,7 +108,7 @@
       /** Converts string to number */
       if (typeof String.prototype.toNumber === "undefined") {
         String.prototype.toNumber = function () {
-          const num = parseFloat(this);
+          const num = Number(this);
           return Number.isNaN(num) ? null : num;
         };
       }
