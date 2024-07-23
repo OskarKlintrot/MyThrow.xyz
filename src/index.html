@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <style data-merge-styles="true"></style>
@@ -18,24 +18,20 @@
     <meta name="msapplication-tooltip" content="My Throw" />
     <meta name="msapplication-starturl" content="/" />
 
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="https://mythrow.xyz/apple-touch-icon.png"
-    />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="https://mythrow.xyz/favicon/favicon-32x32.png"
+      href="/favicon/favicon-32x32.png"
     />
     <link
       rel="icon"
       type="image/png"
       sizes="16x16"
-      href="https://mythrow.xyz/favicon/favicon-16x16.png"
+      href="/favicon/favicon-16x16.png"
     />
-    <link rel="manifest" href="https://mythrow.xyz/site.webmanifest" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <meta name="color-scheme" content="light dark" />
     <meta
@@ -104,7 +100,9 @@
 
       /** Converts numeric degrees to radians */
       if (typeof Number.prototype.toRad === "undefined") {
-        Number.prototype.toRad = () => (this * Math.PI) / 180;
+        Number.prototype.toRad = function () {
+          return (this * Math.PI) / 180;
+        };
       }
 
       const status = document.querySelector("#status");
@@ -129,6 +127,11 @@
        * @return {Number}  Distance in meters
        */
       function getDistanceBetween(from, to) {
+        const toFixedNumber = (num, digits) => {
+          const pow = Math.pow(10, digits);
+
+          return Math.round(num * pow) / pow;
+        };
         const R = 6371;
         const dLat = (to.latitude - from.latitude).toRad();
         const dLong = (to.longitude - from.longitude).toRad();
@@ -140,7 +143,8 @@
             Math.sin(dLong / 2) *
             Math.sin(dLong / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return +(R * c * 1000).toFixed(2); // Convert back .toFixed to number
+        const distance = R * c * 1000;
+        return toFixedNumber(distance, 2);
       }
 
       /**
