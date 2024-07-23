@@ -52,14 +52,14 @@
       <p id="status"></p>
       <p>Distance to starting position: <span id="distance"></span></p>
       <!-- <ol>
-        <li>14</li>
-        <li>15</li>
-      </ol>
-      <p>Average: 14m</p> -->
+      <li>14</li>
+      <li>15</li>
+    </ol>
+    <p>Average: 14m</p> -->
       <hr />
       <button type="button" id="start-btn">set start</button>
       <!-- <button type="button" id="">save</button>
-      <button type="button" id="">reset</button> -->
+    <button type="button" id="">reset</button> -->
     </main>
 
     <style type="text/css">
@@ -89,8 +89,8 @@
       }
 
       /* .hidden {
-        display: none;
-      } */
+      display: none;
+    } */
     </style>
 
     <script src="/keep-screen-on.js" defer=""></script>
@@ -105,17 +105,46 @@
         };
       }
 
+      /** Converts string to number */
+      if (typeof String.prototype.toNumber === "undefined") {
+        String.prototype.toNumber = function () {
+          const num = parseFloat(this);
+          return Number.isNaN(num) ? null : num;
+        };
+      }
+
       const status = document.querySelector("#status");
       const accuracy = document.querySelector("#accuracy");
       const distance = document.querySelector("#distance");
       const state = {
-        current: {
-          longitude: undefined,
-          latitude: undefined,
+        get() {
+          const clone = { ...this._state };
+
+          const lat = localStorage.getItem("tee-latitude");
+          const long = localStorage.getItem("tee-longitude");
+
+          clone.tee.latitude = lat?.toNumber() ?? undefined;
+          clone.tee.longitude = long?.toNumber() ?? undefined;
+
+          return clone;
         },
-        tee: {
-          longitude: undefined,
-          latitude: undefined,
+        update(changes) {
+          this._state = { ...this.get(), ...changes };
+
+          if (this._state.tee.latitude && this._state.tee.longitude) {
+            localStorage.setItem("tee-latitude", this._state.tee.latitude);
+            localStorage.setItem("tee-longitude", this._state.tee.longitude);
+          }
+        },
+        _state: {
+          tee: {
+            latitude: undefined,
+            longitude: undefined,
+          },
+          current: {
+            latitude: undefined,
+            longitude: undefined,
+          },
         },
       };
 
@@ -146,14 +175,18 @@
        * Update distance in the DOM
        */
       function updateDistance() {
-        if (!state.tee.latitude || !state.tee.longitude) {
+        const currentState = state.get();
+        if (!currentState.tee.latitude || !currentState.tee.longitude) {
           return;
         }
         const diff = getDistanceBetween(
-          { latitude: state.tee.latitude, longitude: state.tee.longitude },
           {
-            latitude: state.current.latitude,
-            longitude: state.current.longitude,
+            latitude: currentState.tee.latitude,
+            longitude: currentState.tee.longitude,
+          },
+          {
+            latitude: currentState.current.latitude,
+            longitude: currentState.current.longitude,
           }
         );
         distance.textContent = `${diff}m`;
@@ -164,8 +197,12 @@
        * @param  {Object}  position The current position
        */
       function updatePosition(position) {
-        state.current.latitude = position.coords.latitude;
-        state.current.longitude = position.coords.longitude;
+        state.update({
+          current: {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          },
+        });
 
         status.textContent = `Accuracy: ±${Math.round(
           position.coords.accuracy
@@ -185,9 +222,14 @@
        * Set the starting point to calculate distance from
        */
       function setStartPosition() {
-        if (state.current.latitude && state.current.longitude) {
-          state.tee.latitude = state.current.latitude;
-          state.tee.longitude = state.current.longitude;
+        const currentState = state.get();
+        if (currentState.current.latitude && currentState.current.longitude) {
+          state.update({
+            tee: {
+              latitude: currentState.current.latitude,
+              longitude: currentState.current.longitude,
+            },
+          });
         }
         updateDistance();
       }
