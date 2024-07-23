@@ -20,16 +20,6 @@ let coreAssets = ["/"];
 //
 
 /**
- * Get the documents to cache
- * @return {Promise<string[]>} Paths to documents
- */
-async function getDocuments() {
-  return await fetch("/documents.json")
-    .then((response) => response.json())
-    .then((assets) => [...new Set([...coreAssets, ...assets])]);
-}
-
-/**
  * Check if cached API data is still valid
  * @param  {Object}  response The response object
  * @param  {Number}  goodFor  How long the response is good for, in milliseconds
@@ -60,8 +50,8 @@ self.addEventListener("install", function (event) {
 
   event.waitUntil(
     caches.open(coreID).then(async function (cache) {
-      // Cache all documents
-      for (let asset of await getDocuments()) {
+      // Cache core assets
+      for (let asset of coreAssets) {
         cache.add(new Request(asset)).catch((error) => {
           console.log("Error caching asset:", asset);
           console.error(error);
