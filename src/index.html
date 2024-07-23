@@ -41,7 +41,10 @@
       media="(prefers-color-scheme: dark)"
       content="#24292e"
     />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
+    />
   </head>
 
   <body>
@@ -213,6 +216,17 @@
         updateDistance();
       }
 
+      /**
+       * Add "disabled"-attribute to the element for 750ms. 
+      */
+      function disableBriefly(e) {
+        const element = e.srcElement;
+        element.setAttribute("disabled", true);
+        setTimeout(() => {
+          element.removeAttribute("disabled");
+        }, 750);
+      }
+
       if (!navigator.geolocation) {
         status.textContent = "Geolocation is not supported by your browser.";
       } else {
@@ -226,6 +240,10 @@
       document
         .querySelector("#start-btn")
         .addEventListener("click", setStartPosition);
+
+      document
+        .querySelector("#start-btn")
+        .addEventListener("click", disableBriefly);
     </script>
   </body>
 </html>
