@@ -124,10 +124,8 @@
        * @return {Number}  Distance in meters
        */
       function getDistanceBetween(from, to) {
-        console.log(from);
-        console.log(to);
         const degToRad = (deg) => deg * (Math.PI / 180);
-        const R = 6371; // Radius of the earth in km
+        const R = 6371 * 1000; // Radius of the earth in meters
         const dLat = degToRad(to.latitude - from.latitude);
         const dLon = degToRad(from.longitude - from.longitude);
         const a =
@@ -137,7 +135,7 @@
             Math.sin(dLon / 2) *
             Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return Math.round(R * c * 1000); // Distance in meters
+        return R * c; // Distance in meters
       }
 
       /**
