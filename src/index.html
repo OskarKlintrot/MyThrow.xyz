@@ -127,11 +127,6 @@
        * @return {Number}  Distance in meters
        */
       function getDistanceBetween(from, to) {
-        const toFixedNumber = (num, digits) => {
-          const pow = Math.pow(10, digits);
-
-          return Math.round(num * pow) / pow;
-        };
         const R = 6371;
         const dLat = (to.latitude - from.latitude).toRad();
         const dLong = (to.longitude - from.longitude).toRad();
@@ -144,7 +139,7 @@
             Math.sin(dLong / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         const distance = R * c * 1000;
-        return toFixedNumber(distance, 2);
+        return Math.round(distance);
       }
 
       /**
