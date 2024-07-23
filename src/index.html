@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style data-merge-styles="true"></style>
+    <style data-merge-styles="true"></style>
+    <style data-merge-styles="true"></style>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+    />
+
+    <title>My Throw</title>
+
+    <link rel="canonical" href="https://mythrow.xyz/" />
+
+    <meta name="application-name" content="My Throw" />
+    <meta name="msapplication-tooltip" content="My Throw" />
+    <meta name="msapplication-starturl" content="/" />
+
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://mythrow.xyz/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://mythrow.xyz/favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="https://mythrow.xyz/favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="https://mythrow.xyz/site.webmanifest" />
+
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#f2f2f2"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#24292e"
+    />
+  </head>
+
+  <body>
+    <main>
+      <!-- <button type="button" class="top-right-corner">meter/feet</button> -->
+      <p id="status"></p>
+      <p>Distance to starting position: <span id="distance"></span></p>
+      <!-- <ol>
+        <li>14</li>
+        <li>15</li>
+      </ol>
+      <p>Average: 14m</p> -->
+      <hr />
+      <button type="button" id="start-btn">set start</button>
+      <!-- <button type="button" id="">save</button>
+      <button type="button" id="">reset</button> -->
+    </main>
+
+    <style type="text/css">
+      body {
+        margin: 5% auto;
+        background: #f2f2f2;
+        max-width: 75ch;
+        line-height: 1.6;
+        font-family: system-ui, sans-serif;
+        font-size: 1.1rem;
+        color: #24292e;
+        text-shadow: 0 0.07rem 0 #ffffff;
+        padding: 0 0.6rem;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #24292e;
+          color: #f2f2f2;
+          text-shadow: 0 0.07rem 0 #000000;
+        }
+      }
+      .top-right-corner {
+        position: absolute;
+        top: 1em;
+        right: 1em;
+      }
+
+      /* .hidden {
+        display: none;
+      } */
+    </style>
+
+    <script src="/keep-screen-on.js" defer=""></script>
+
+    <script>
+      navigator.serviceWorker.register("/sw.js");
+
+      const status = document.querySelector("#status");
+      const accuracy = document.querySelector("#accuracy");
+      const distance = document.querySelector("#distance");
+      const state = {
+        current: {
+          longitude: undefined,
+          latitude: undefined,
+        },
+        tee: {
+          longitude: undefined,
+          latitude: undefined,
+        },
+      };
+
+      /**
+       * Calculate distance using the haversine formula.
+       * From https://stackoverflow.com/q/18883601
+       * @param  {Object}  from The starting position
+       * @param  {Object}  to   The ending position
+       * @return {Number}  Distance in km
+       */
+      function getDistanceBetween(from, to) {
+        console.log(from);
+        console.log(to);
+        const degToRad = (deg) => deg * (Math.PI / 180);
+        const R = 6371; // Radius of the earth in km
+        const dLat = degToRad(to.latitude - from.latitude);
+        const dLon = degToRad(from.longitude - from.longitude);
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(degToRad(from.latitude)) *
+            Math.cos(degToRad(to.latitude)) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in km
+      }
+
+      /**
+       * Update distance in the DOM
+       */
+      function updateDistance() {
+        if (!state.tee.latitude || !state.tee.longitude) {
+          return;
+        }
+        const diff = getDistanceBetween(
+          { latitude: state.tee.latitude, longitude: state.tee.longitude },
+          {
+            latitude: state.current.latitude,
+            longitude: state.current.longitude,
+          }
+        );
+        distance.textContent = `${diff}m`;
+      }
+
+      /**
+       * Update the current position in the state object
+       * @param  {Object}  position The current position
+       */
+      function updatePosition(position) {
+        state.current.latitude = position.coords.latitude;
+        state.current.longitude = position.coords.longitude;
+
+        status.textContent = `Accuracy: ±${position.coords.accuracy}m`;
+
+        updateDistance();
+      }
+
+      /**
+       * Error when retrieve the position
+       */
+      function error() {
+        status.textContent = "Unable to retrieve your location";
+      }
+
+      /**
+       * Set the starting point to calculate distance from
+       */
+      function setStartPosition() {
+        if (state.current.latitude && state.current.longitude) {
+          state.tee.latitude = state.current.latitude;
+          state.tee.longitude = state.current.longitude;
+        }
+        updateDistance();
+      }
+
+      if (!navigator.geolocation) {
+        status.textContent = "Geolocation is not supported by your browser.";
+      } else {
+        status.textContent = "Locating…";
+        const options = {
+          enableHighAccuracy: true,
+        };
+        navigator.geolocation.watchPosition(updatePosition, error, options);
+      }
+
+      document
+        .querySelector("#start-btn")
+        .addEventListener("click", setStartPosition);
+    </script>
+  </body>
+</html>

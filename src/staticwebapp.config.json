@@ -1,0 +1,20 @@
+{
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/404"
+    }
+  },
+  "trailingSlash": "never",
+  "routes": [
+    {
+      "route": "/.auth/*",
+      "statusCode": 404
+    }
+  ],
+  "mimeTypes": {
+    ".webmanifest": "application/manifest+json"
+  },
+  "globalHeaders": {
+    "Permission-Policy": "unload()"
+  }
+}
