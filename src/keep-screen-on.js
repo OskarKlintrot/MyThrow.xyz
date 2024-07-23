@@ -1,42 +1,42 @@
 "use strict";
 
 (async function () {
-    if ('wakeLock' in navigator) {
-        const timeoutTime = 30 * 60 * 1000; // 30 minutes
-        let wakeLock = null;
+  if ("wakeLock" in navigator) {
+    const timeoutTime = 30 * 60 * 1000; // 30 minutes
+    let wakeLock = null;
 
-        const resetTimer = () => {
-            clearTimeout(timeoutTimer);
-            timeoutTimer = setTimeout(releaseWakeLock, timeoutTime);
-        }
+    const resetTimer = () => {
+      clearTimeout(timeoutTimer);
+      timeoutTimer = setTimeout(releaseWakeLock, timeoutTime);
+    };
 
-        const requestWakeLock = async () => {
-            try {
-                wakeLock = await navigator.wakeLock.request('screen');
-                resetTimer();
-            } catch (err) {
-                // if wake lock request fails - usually system related, such as battery
-            }
-        }
+    const requestWakeLock = async () => {
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+        resetTimer();
+      } catch (err) {
+        // if wake lock request fails - usually system related, such as battery
+      }
+    };
 
-        const releaseWakeLock = async () => {
-            try {
-                await wakeLock.release('screen');
-            } catch (err) { }
-        }
+    const releaseWakeLock = async () => {
+      try {
+        await wakeLock.release("screen");
+      } catch (err) {}
+    };
 
-        let timeoutTimer = setTimeout(releaseWakeLock, timeoutTime);
+    let timeoutTimer = setTimeout(releaseWakeLock, timeoutTime);
 
-        document.addEventListener("touchstart", () => {
-            requestWakeLock();
-        });
+    document.addEventListener("touchstart", () => {
+      requestWakeLock();
+    });
 
-        document.addEventListener('visibilitychange', (() => {
-            if (document.visibilityState === 'visible') {
-                requestWakeLock();
-            }
-        }));
-
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
         requestWakeLock();
-    }
+      }
+    });
+
+    requestWakeLock();
+  }
 })();

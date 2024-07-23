@@ -1,34 +1,34 @@
 {
-    "id": "/",
-    "name": "My Throw",
-    "short_name": "Throw",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#f2f2f2",
-    "theme_color": "#f2f2f2",
-    "icons": [
-        {
-            "sizes": "192x192",
-            "src": "android-chrome-192x192.png",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "sizes": "192x192",
-            "src": "maskable_icon_x192.png",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "android-chrome-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        },
-        {
-            "src": "maskable_icon_x512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-        }
-    ]
+  "id": "/",
+  "name": "My Throw",
+  "short_name": "Throw",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f2f2f2",
+  "theme_color": "#f2f2f2",
+  "icons": [
+    {
+      "sizes": "192x192",
+      "src": "android-chrome-192x192.png",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "sizes": "192x192",
+      "src": "maskable_icon_x192.png",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "maskable_icon_x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
 }

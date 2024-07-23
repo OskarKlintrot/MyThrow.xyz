@@ -13,7 +13,7 @@ let imgID = `${version}_img`;
 let cacheIDs = [coreID, pageID, assetID, imgID];
 
 // Core assets
-let coreAssets = [ "/" ];
+let coreAssets = ["/"];
 
 //
 // Helper Methods
