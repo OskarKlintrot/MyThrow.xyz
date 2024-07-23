@@ -102,6 +102,11 @@
     <script>
       navigator.serviceWorker.register("/sw.js");
 
+      /** Converts numeric degrees to radians */
+      if (typeof Number.prototype.toRad === "undefined") {
+        Number.prototype.toRad = () => (this * Math.PI) / 180;
+      }
+
       const status = document.querySelector("#status");
       const accuracy = document.querySelector("#accuracy");
       const distance = document.querySelector("#distance");
@@ -124,18 +129,18 @@
        * @return {Number}  Distance in meters
        */
       function getDistanceBetween(from, to) {
-        const degToRad = (deg) => deg * (Math.PI / 180);
-        const R = 6371 * 1000; // Radius of the earth in meters
-        const dLat = degToRad(to.latitude - from.latitude);
-        const dLon = degToRad(from.longitude - from.longitude);
+        const R = 6371;
+        const dLat = (to.latitude - from.latitude).toRad();
+        const dLong = (to.longitude - from.longitude).toRad();
+
         const a =
           Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos(degToRad(from.latitude)) *
-            Math.cos(degToRad(to.latitude)) *
-            Math.sin(dLon / 2) *
-            Math.sin(dLon / 2);
+          Math.cos(from.latitude.toRad()) *
+            Math.cos(to.latitude.toRad()) *
+            Math.sin(dLong / 2) *
+            Math.sin(dLong / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // Distance in meters
+        return +(R * c * 1000).toFixed(2); // Convert back .toFixed to number
       }
 
       /**
@@ -163,7 +168,9 @@
         state.current.latitude = position.coords.latitude;
         state.current.longitude = position.coords.longitude;
 
-        status.textContent = `Accuracy: ±${Math.round(position.coords.accuracy)}m`;
+        status.textContent = `Accuracy: ±${Math.round(
+          position.coords.accuracy
+        )}m`;
 
         updateDistance();
       }
