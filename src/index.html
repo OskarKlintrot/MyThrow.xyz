@@ -109,8 +109,8 @@
         get() {
           const clone = { ...this._state };
 
-          const lat = localStorage.getItem("tee-latitude");
-          const long = localStorage.getItem("tee-longitude");
+          const lat = sessionStorage.getItem("tee-latitude");
+          const long = sessionStorage.getItem("tee-longitude");
 
           clone.tee.latitude = lat?.toNumber() ?? undefined;
           clone.tee.longitude = long?.toNumber() ?? undefined;
@@ -121,8 +121,8 @@
           this._state = { ...this.get(), ...changes };
 
           if (this._state.tee.latitude && this._state.tee.longitude) {
-            localStorage.setItem("tee-latitude", this._state.tee.latitude);
-            localStorage.setItem("tee-longitude", this._state.tee.longitude);
+            sessionStorage.setItem("tee-latitude", this._state.tee.latitude);
+            sessionStorage.setItem("tee-longitude", this._state.tee.longitude);
           }
         },
         _state: {
