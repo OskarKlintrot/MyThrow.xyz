@@ -58,12 +58,19 @@
       </ol>
       <p>Average: 14m</p> -->
       <hr />
-      <button type="button" id="start-btn">set start</button>
-      <!-- <button type="button" id="">save</button>
-      <button type="button" id="">reset</button> -->
+      <div class="center-content">
+        <button type="button" id="start-btn">set start</button>
+        <!-- <button type="button" id="">save</button>
+        <button type="button" id="">reset</button> -->
+      </div>
     </main>
 
     <style type="text/css">
+      .center-content > * {
+        margin: auto;
+        display: block;
+      }
+
       .top-right-corner {
         position: absolute;
         top: 1em;
@@ -217,8 +224,8 @@
       }
 
       /**
-       * Add "disabled"-attribute to the element for 750ms. 
-      */
+       * Add "disabled"-attribute to the element for 750ms.
+       */
       function disableBriefly(e) {
         const element = e.srcElement;
         element.setAttribute("disabled", true);
