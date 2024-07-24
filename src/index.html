@@ -58,6 +58,7 @@
       </main>
       <footer>
         <button type="button" id="start-btn">set start</button>
+        <button type="button" id="reset-btn">reset</button>
         <button type="button" id="unit-btn">...</button>
       </footer>
     </div>
@@ -97,7 +98,7 @@
 
       footer {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 0.3rem;
         grid-auto-rows: auto;
         padding-bottom: 1rem;
@@ -107,7 +108,6 @@
         padding-right: 0.1rem;
         padding-left: 0.1rem;
       }
-
     </style>
 
     <script src="/keep-screen-on.js" defer=""></script>
@@ -150,10 +150,8 @@
         update(changes) {
           this._updateNestedObject(this._state, changes);
 
-          if (this._state.tee.latitude && this._state.tee.longitude) {
-            sessionStorage.setItem("tee-latitude", this._state.tee.latitude);
-            sessionStorage.setItem("tee-longitude", this._state.tee.longitude);
-          }
+          sessionStorage.setItem("tee-latitude", this._state.tee.latitude);
+          sessionStorage.setItem("tee-longitude", this._state.tee.longitude);
 
           if (changes.unit === "feet" || changes.unit === "meter") {
             localStorage.setItem("unit", changes.unit);
@@ -167,6 +165,14 @@
                 });
               }
             }
+          });
+        },
+        reset() {
+          this.update({
+            tee: {
+              latitude: undefined,
+              longitude: undefined,
+            },
           });
         },
         _updateNestedObject(target, updates) {
@@ -263,6 +269,7 @@
        */
       function updateDistance(state) {
         if (!state.tee.latitude || !state.tee.longitude) {
+          distance.textContent = "";
           return;
         }
         const diff = getDistanceBetween(
@@ -343,7 +350,7 @@
         element.setAttribute("disabled", true);
         setTimeout(() => {
           element.removeAttribute("disabled");
-        }, 750);
+        }, 1000);
       }
 
       function toggleUnit(e) {
@@ -383,6 +390,13 @@
       document.querySelector("#unit-btn").textContent =
         state.get().unit === "feet" ? "meter" : "feet";
       document.querySelector("#unit-btn").addEventListener("click", toggleUnit);
+
+      document
+        .querySelector("#reset-btn")
+        .addEventListener("click", (e) => state.reset());
+      document
+        .querySelector("#reset-btn")
+        .addEventListener("click", disableBriefly);
     </script>
   </body>
 </html>
