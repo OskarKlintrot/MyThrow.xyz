@@ -74,8 +74,8 @@
           current position will be saved and an average of all throws will be
           calculated. To start over just press "reset all" or close this tab in
           your browser. You can press "set start" multiple times, each time the
-          position will reset to your current location and all distances will be
-          recalculated.
+          starting position will reset to your current location and all
+          distances will be recalculated.
         </p>
         <p>
           Source code is available at
@@ -397,7 +397,7 @@
           }
         })();
 
-        status.textContent = `Accuracy is ${plaintext}: ±${getDistanceWithPreferredUnit(
+        status.textContent = `Accuracy is ${plaintext} at ±${getDistanceWithPreferredUnit(
           state.current.accuracy
         )}`;
       }
