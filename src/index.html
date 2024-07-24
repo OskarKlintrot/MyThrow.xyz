@@ -107,22 +107,34 @@
       const distance = document.querySelector("#distance");
       const state = {
         get() {
-          const clone = { ...this._state };
+          if (!this._state.tee.latitude || !this._state.tee.longitude) {
+            const lat = sessionStorage.getItem("tee-latitude");
+            const long = sessionStorage.getItem("tee-longitude");
 
-          const lat = sessionStorage.getItem("tee-latitude");
-          const long = sessionStorage.getItem("tee-longitude");
+            this._state.tee.latitude = lat?.toNumber() ?? undefined;
+            this._state.tee.longitude = long?.toNumber() ?? undefined;
+          }
 
-          clone.tee.latitude = lat?.toNumber() ?? undefined;
-          clone.tee.longitude = long?.toNumber() ?? undefined;
-
-          return clone;
+          return { ...this._state };
         },
         update(changes) {
-          this._state = { ...this.get(), ...changes };
+          this._updateNestedObject(this._state, changes);
 
           if (this._state.tee.latitude && this._state.tee.longitude) {
             sessionStorage.setItem("tee-latitude", this._state.tee.latitude);
             sessionStorage.setItem("tee-longitude", this._state.tee.longitude);
+          }
+        },
+        _updateNestedObject(target, updates) {
+          for (const key in updates) {
+            if (typeof updates[key] === "object" && updates[key] !== null) {
+              if (!target[key]) {
+                target[key] = {};
+              }
+              this._updateNestedObject(target[key], updates[key]);
+            } else {
+              target[key] = updates[key];
+            }
           }
         },
         _state: {
