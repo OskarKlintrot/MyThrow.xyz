@@ -267,7 +267,7 @@
       function updatePosition(position) {
         state.update({
           current: {
-            accuracy: position.coords.accuracy,
+            accuracy: position.coords.accuracy * 100, // Save accuracy in cm to simplify conversions later
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
           },
