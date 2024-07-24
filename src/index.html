@@ -255,7 +255,18 @@
        * @param  {Object} state
        */
       function updateAccuracy(state) {
-        status.textContent = `Accuracy: ±${getDistanceWithPreferredUnit(
+        const description = (() => {
+          switch (true) {
+            case state.current.accuracy < 550:
+              return "good";
+            case state.current.accuracy < 1050:
+              return "decent";
+            default:
+              return "bad";
+          }
+        })();
+
+        status.textContent = `Accuracy ${description}: ±${getDistanceWithPreferredUnit(
           state.current.accuracy
         )}`;
       }
