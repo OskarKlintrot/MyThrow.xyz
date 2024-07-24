@@ -53,8 +53,8 @@
         <h1>MyThrow.xyz</h1>
       </header>
       <main>
-        <p id="status"></p>
-        <p>Distance: <span id="distance"></span></p>
+        <p>Distance: <span id="distance">–</span></p>
+        <p><small id="status"></small></p>
         <div id="throws-statistics"></div>
       </main>
       <footer>
@@ -67,7 +67,7 @@
 
     <style type="text/css">
       body {
-        font-size: 1.4em;
+        font-size: 1.5em;
         margin: 0; /* prevents scrollbars */
       }
 
@@ -287,7 +287,7 @@
           !state.current.latitude ||
           !state.current.longitude
         ) {
-          distance.textContent = "";
+          distance.textContent = "–";
           return;
         }
         const diff = getDistanceBetween(
