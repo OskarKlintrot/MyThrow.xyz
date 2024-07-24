@@ -257,9 +257,9 @@
       function updateAccuracy(state) {
         const description = (() => {
           switch (true) {
-            case state.current.accuracy < 550:
+            case state.current.accuracy < 500:
               return "good";
-            case state.current.accuracy < 1050:
+            case state.current.accuracy < 1000:
               return "decent";
             default:
               return "bad";
