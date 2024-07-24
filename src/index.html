@@ -115,6 +115,8 @@
             this._state.tee.longitude = long?.toNumber() ?? undefined;
           }
 
+          this._state.unit = localStorage.getItem("unit");
+
           return { ...this._state };
         },
         update(changes) {
@@ -124,6 +126,20 @@
             sessionStorage.setItem("tee-latitude", this._state.tee.latitude);
             sessionStorage.setItem("tee-longitude", this._state.tee.longitude);
           }
+
+          if (changes.unit === "feet" || changes.unit === "meter") {
+            localStorage.setItem("unit", changes.unit);
+          }
+
+          this._getPaths(changes).forEach((path) => {
+            for (const pattern in this._observers) {
+              if (this._matchPath(pattern, path)) {
+                this._observers[pattern].forEach((listener) => {
+                  listener(this.get());
+                });
+              }
+            }
+          });
         },
         _updateNestedObject(target, updates) {
           for (const key in updates) {
@@ -137,7 +153,34 @@
             }
           }
         },
+        _getPaths(obj, prefix = "") {
+          const paths = [];
+
+          for (const key in obj) {
+            const path = prefix ? `${prefix}.${key}` : key;
+            if (typeof obj[key] === "object" && obj[key] !== null) {
+              paths.push(...this._getPaths(obj[key], path));
+            } else {
+              paths.push(path);
+            }
+          }
+
+          return paths;
+        },
+        _matchPath(pattern, path) {
+          const regex = new RegExp(
+            "^" + pattern.replace("\.", "\\.").replace(/\*/g, ".*") + "$"
+          );
+          return regex.test(path);
+        },
+        _observers: {
+          "current.accuracy": [updateAccuracy],
+          "current.*": [updateDistance],
+          "tee.*": [updateDistance],
+          unit: [updateAccuracy, updateDistance],
+        },
         _state: {
+          unit: "meter",
           tee: {
             latitude: undefined,
             longitude: undefined,
@@ -156,8 +199,7 @@
        * @return {string}  Distance in the preferred unit with the unit attached
        */
       function getDistanceWithPreferredUnit(distance) {
-        const unit = localStorage.getItem("unit");
-        if (unit === "feet") {
+        if (state.get().unit === "feet") {
           return `${Math.round(distance * 0.0328084)} feet`;
         } else {
           return `${Math.round(distance / 100)}m`;
@@ -189,20 +231,20 @@
 
       /**
        * Update distance in the DOM
+       * @param  {Object} state
        */
-      function updateDistance() {
-        const currentState = state.get();
-        if (!currentState.tee.latitude || !currentState.tee.longitude) {
+      function updateDistance(state) {
+        if (!state.tee.latitude || !state.tee.longitude) {
           return;
         }
         const diff = getDistanceBetween(
           {
-            latitude: currentState.tee.latitude,
-            longitude: currentState.tee.longitude,
+            latitude: state.tee.latitude,
+            longitude: state.tee.longitude,
           },
           {
-            latitude: currentState.current.latitude,
-            longitude: currentState.current.longitude,
+            latitude: state.current.latitude,
+            longitude: state.current.longitude,
           }
         );
         distance.textContent = getDistanceWithPreferredUnit(diff);
@@ -210,14 +252,11 @@
 
       /**
        * Update accuracy in the DOM
+       * @param  {Object} state
        */
-      function updateAccuracy() {
-        const currentState = state.get();
-        if (!currentState.current.accuracy) {
-          return;
-        }
+      function updateAccuracy(state) {
         status.textContent = `Accuracy: ±${getDistanceWithPreferredUnit(
-          currentState.current.accuracy
+          state.current.accuracy
         )}`;
       }
 
@@ -233,9 +272,6 @@
             longitude: position.coords.longitude,
           },
         });
-
-        updateAccuracy();
-        updateDistance();
       }
 
       /**
@@ -258,7 +294,6 @@
             },
           });
         }
-        updateDistance();
       }
 
       /**
@@ -274,17 +309,14 @@
 
       function toggleUnit(e) {
         const btn = document.querySelector("#unit-btn");
-        const unit = localStorage.getItem("unit");
-        if (unit === "feet") {
-          localStorage.removeItem("unit");
+
+        if (state.get().unit === "feet") {
+          state.update({ unit: "meter" });
           btn.textContent = "feet";
         } else {
-          localStorage.setItem("unit", "feet");
+          state.update({ unit: "feet" });
           btn.textContent = "meter";
         }
-
-        updateAccuracy();
-        updateDistance();
       }
 
       if (!navigator.geolocation) {
@@ -305,8 +337,7 @@
         .querySelector("#start-btn")
         .addEventListener("click", disableBriefly);
 
-      document.querySelector("#unit-btn").textContent =
-        localStorage.getItem("unit") === "feet" ? "meter" : "feet";
+      document.querySelector("#unit-btn").textContent = state.get().unit;
       document.querySelector("#unit-btn").addEventListener("click", toggleUnit);
     </script>
   </body>
