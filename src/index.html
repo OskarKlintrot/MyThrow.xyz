@@ -49,9 +49,9 @@
 
   <body>
     <main>
-      <!-- <button type="button" class="top-right-corner">meter/feet</button> -->
+      <button type="button" id="unit-btn" class="top-right-corner">...</button>
       <p id="status"></p>
-      <p>Distance to starting position: <span id="distance"></span></p>
+      <p>Distance: <span id="distance"></span></p>
       <!-- <ol>
         <li>14</li>
         <li>15</li>
@@ -131,6 +131,7 @@
             longitude: undefined,
           },
           current: {
+            accuracy: undefined,
             latitude: undefined,
             longitude: undefined,
           },
@@ -138,11 +139,25 @@
       };
 
       /**
+       * Convert the distance from cm to feet or meter and add unit.
+       * @param  {Number}  distance Distance in centimeters
+       * @return {string}  Distance in the preferred unit with the unit attached
+       */
+      function getDistanceWithPreferredUnit(distance) {
+        const unit = localStorage.getItem("unit");
+        if (unit === "feet") {
+          return `${Math.round(distance * 0.0328084)} feet`;
+        } else {
+          return `${Math.round(distance / 100)}m`;
+        }
+      }
+
+      /**
        * Calculate distance using the haversine formula.
        * From https://stackoverflow.com/q/18883601
        * @param  {Object}  from The starting position
        * @param  {Object}  to   The ending position
-       * @return {Number}  Distance in meters
+       * @return {Number}  Distance in centimeters
        */
       function getDistanceBetween(from, to) {
         const R = 6371;
@@ -156,7 +171,7 @@
             Math.sin(dLong / 2) *
             Math.sin(dLong / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        const distance = R * c * 1000;
+        const distance = R * c * 1000 * 100;
         return Math.round(distance);
       }
 
@@ -178,7 +193,20 @@
             longitude: currentState.current.longitude,
           }
         );
-        distance.textContent = `${diff}m`;
+        distance.textContent = getDistanceWithPreferredUnit(diff);
+      }
+
+      /**
+       * Update accuracy in the DOM
+       */
+      function updateAccuracy() {
+        const currentState = state.get();
+        if (!currentState.current.accuracy) {
+          return;
+        }
+        status.textContent = `Accuracy: ±${getDistanceWithPreferredUnit(
+          currentState.current.accuracy
+        )}`;
       }
 
       /**
@@ -188,15 +216,13 @@
       function updatePosition(position) {
         state.update({
           current: {
+            accuracy: position.coords.accuracy,
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
           },
         });
 
-        status.textContent = `Accuracy: ±${Math.round(
-          position.coords.accuracy
-        )}m`;
-
+        updateAccuracy();
         updateDistance();
       }
 
@@ -234,6 +260,21 @@
         }, 750);
       }
 
+      function toggleUnit(e) {
+        const btn = document.querySelector("#unit-btn");
+        const unit = localStorage.getItem("unit");
+        if (unit === "feet") {
+          localStorage.removeItem("unit");
+          btn.textContent = "feet";
+        } else {
+          localStorage.setItem("unit", "feet");
+          btn.textContent = "meter";
+        }
+
+        updateAccuracy();
+        updateDistance();
+      }
+
       if (!navigator.geolocation) {
         status.textContent = "Geolocation is not supported by your browser.";
       } else {
@@ -251,6 +292,10 @@
       document
         .querySelector("#start-btn")
         .addEventListener("click", disableBriefly);
+
+      document.querySelector("#unit-btn").textContent =
+        localStorage.getItem("unit") === "feet" ? "meter" : "feet";
+      document.querySelector("#unit-btn").addEventListener("click", toggleUnit);
     </script>
   </body>
 </html>
