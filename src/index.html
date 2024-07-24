@@ -48,42 +48,65 @@
   </head>
 
   <body>
-    <main>
-      <h1>MyThrow.xyz</h1>
-      <p id="status"></p>
-      <p>Distance: <span id="distance"></span></p>
-      <!-- <ol>
-        <li>14</li>
-        <li>15</li>
-      </ol>
-      <p>Average: 14m</p> -->
-      <hr />
-      <div class="center-content">
+    <div id="app">
+      <header>
+        <h1>MyThrow.xyz</h1>
+      </header>
+      <main>
+        <p id="status"></p>
+        <p>Distance: <span id="distance"></span></p>
+      </main>
+      <footer>
         <button type="button" id="start-btn">set start</button>
         <button type="button" id="unit-btn">...</button>
-        <!-- <button type="button" id="">save</button>
-        <button type="button" id="">reset</button> -->
-      </div>
-    </main>
+      </footer>
+    </div>
 
     <style type="text/css">
       body {
         font-size: 1.5em;
+        margin: 0; /* prevents scrollbars */
       }
 
-      .center-content {
-        width: 100%;
-        text-align: center;
+      #app {
+        height: 100vh;
+
+        /* grid container settings */
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas:
+          "header"
+          "main"
+          "footer";
       }
 
-      .center-content > * {
-        display: inline-block;
-        margin: 2px;
+      #app > header {
+        grid-area: header;
       }
 
-      /* .hidden {
-        display: none;
-      } */
+      #app > main {
+        overflow: auto;
+        grid-area: main;
+        padding: 0 5px 10px 5px;
+      }
+
+      #app > footer {
+        grid-area: footer;
+      }
+
+      footer {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.3rem;
+        grid-auto-rows: auto;
+      }
+
+      footer > button {
+        padding-right: 0.1rem;
+        padding-left: 0.1rem;
+      }
+
     </style>
 
     <script src="/keep-screen-on.js" defer=""></script>
