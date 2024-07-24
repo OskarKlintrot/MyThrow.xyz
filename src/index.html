@@ -313,7 +313,7 @@
           return;
         }
 
-        const description = (() => {
+        const plaintext = (() => {
           switch (true) {
             case state.current.accuracy < 500:
               return "good";
@@ -324,7 +324,7 @@
           }
         })();
 
-        status.textContent = `Accuracy is ${description}: ±${getDistanceWithPreferredUnit(
+        status.textContent = `Accuracy is ${plaintext}: ±${getDistanceWithPreferredUnit(
           state.current.accuracy
         )}`;
       }
