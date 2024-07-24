@@ -55,10 +55,12 @@
       <main>
         <p id="status"></p>
         <p>Distance: <span id="distance"></span></p>
+        <div id="throws-statistics"></div>
       </main>
       <footer>
         <button type="button" id="start-btn">set start</button>
-        <button type="button" id="reset-btn">reset</button>
+        <button type="button" id="save-btn">save throw</button>
+        <button type="button" id="reset-btn">reset all</button>
         <button type="button" id="unit-btn">...</button>
       </footer>
     </div>
@@ -98,7 +100,7 @@
 
       footer {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: 0.3rem;
         grid-auto-rows: auto;
         padding-bottom: 1rem;
@@ -134,22 +136,26 @@
       const accuracy = document.querySelector("#accuracy");
       const distance = document.querySelector("#distance");
       const state = {
+        init() {
+          const lat = sessionStorage.getItem("tee-latitude");
+          const long = sessionStorage.getItem("tee-longitude");
+
+          this.update({
+            unit: localStorage.getItem("unit") ?? "meter",
+            tee: {
+              latitude: lat?.toNumber() ?? undefined,
+              longitude: long?.toNumber() ?? undefined,
+            },
+            throws: JSON.parse(sessionStorage.getItem("throws")) ?? [],
+          });
+        },
         get() {
-          if (!this._state.tee.latitude || !this._state.tee.longitude) {
-            const lat = sessionStorage.getItem("tee-latitude");
-            const long = sessionStorage.getItem("tee-longitude");
-
-            this._state.tee.latitude = lat?.toNumber() ?? undefined;
-            this._state.tee.longitude = long?.toNumber() ?? undefined;
-          }
-
-          this._state.unit = localStorage.getItem("unit") ?? undefined;
-
           return { ...this._state };
         },
         update(changes) {
           this._updateNestedObject(this._state, changes);
 
+          sessionStorage.setItem("throws", JSON.stringify(this._state.throws));
           sessionStorage.setItem("tee-latitude", this._state.tee.latitude);
           sessionStorage.setItem("tee-longitude", this._state.tee.longitude);
 
@@ -157,10 +163,10 @@
             localStorage.setItem("unit", changes.unit);
           }
 
-          this._getPaths(changes).forEach((path) => {
+          this._getPaths(changes).forEach(path => {
             for (const pattern in this._observers) {
               if (this._matchPath(pattern, path)) {
-                this._observers[pattern].forEach((listener) => {
+                this._observers[pattern].forEach(listener => {
                   listener(this.get());
                 });
               }
@@ -169,6 +175,7 @@
         },
         reset() {
           this.update({
+            throws: [],
             tee: {
               latitude: undefined,
               longitude: undefined,
@@ -177,8 +184,12 @@
         },
         _updateNestedObject(target, updates) {
           for (const key in updates) {
-            if (typeof updates[key] === "object" && updates[key] !== null) {
-              if (!target[key]) {
+            if (
+              typeof updates[key] === "object" &&
+              updates[key] !== null &&
+              !Array.isArray(updates[key])
+            ) {
+              if (typeof target[key] !== "object" || target[key] === null) {
                 target[key] = {};
               }
               this._updateNestedObject(target[key], updates[key]);
@@ -210,11 +221,13 @@
         _observers: {
           "current.accuracy": [updateAccuracy],
           "current.*": [updateDistance],
-          "tee.*": [updateDistance],
-          unit: [updateAccuracy, updateDistance],
+          "tee.*": [updateDistance, updateThrows],
+          unit: [updateAccuracy, updateDistance, updateThrows],
+          "throws.*": [updateThrows],
         },
         _state: {
           unit: undefined,
+          throws: [],
           tee: {
             latitude: undefined,
             longitude: undefined,
@@ -268,7 +281,12 @@
        * @param  {Object} state
        */
       function updateDistance(state) {
-        if (!state.tee.latitude || !state.tee.longitude) {
+        if (
+          !state.tee.latitude ||
+          !state.tee.longitude ||
+          !state.current.latitude ||
+          !state.current.longitude
+        ) {
           distance.textContent = "";
           return;
         }
@@ -282,6 +300,7 @@
             longitude: state.current.longitude,
           }
         );
+
         distance.textContent = getDistanceWithPreferredUnit(diff);
       }
 
@@ -290,6 +309,10 @@
        * @param  {Object} state
        */
       function updateAccuracy(state) {
+        if (typeof state.current.accuracy !== "number") {
+          return;
+        }
+
         const description = (() => {
           switch (true) {
             case state.current.accuracy < 500:
@@ -301,9 +324,68 @@
           }
         })();
 
-        status.textContent = `Accuracy ${description}: ±${getDistanceWithPreferredUnit(
+        status.textContent = `Accuracy is ${description}: ±${getDistanceWithPreferredUnit(
           state.current.accuracy
         )}`;
+      }
+
+      /**
+       * Update throws in the DOM
+       * @param  {Object} state
+       */
+      function updateThrows(state) {
+        const div = document.querySelector("#throws-statistics");
+
+        if (!state.throws || state.throws?.length === 0) {
+          div.textContent = "";
+          return;
+        }
+
+        if (state.tee.latitude && state.tee.longitude) {
+          const distances = state.throws.map(t =>
+            getDistanceBetween(
+              {
+                latitude: state.tee.latitude,
+                longitude: state.tee.longitude,
+              },
+              {
+                latitude: t.latitude,
+                longitude: t.longitude,
+              }
+            )
+          );
+
+          const average =
+            distances.reduce(
+              (accumulator, currentValue) => accumulator + currentValue,
+              0
+            ) / distances.length;
+
+          const ol = document.createElement("ol");
+
+          distances
+            .map(d => getDistanceWithPreferredUnit(d))
+            .map(s => {
+              const li = document.createElement("li");
+              li.textContent = s;
+              return li;
+            })
+            .forEach(t => ol.appendChild(t));
+
+          const p = document.createElement("p");
+          p.textContent = `Average: ${getDistanceWithPreferredUnit(average)}`;
+
+          div.innerHTML = `<h2>Throws</h2>`;
+
+          div.appendChild(ol);
+          div.appendChild(p);
+        } else {
+          div.textContent = "";
+          const p = document.createElement("p");
+          p.textContent = `Set starting position to calculate distance for ${state.throws.length} throws.`;
+
+          div.appendChild(p);
+        }
       }
 
       /**
@@ -343,6 +425,32 @@
       }
 
       /**
+       * Save the current position as a throw
+       */
+      function saveThrow() {
+        const currentState = state.get();
+        const _throw = {
+          latitude: currentState.current.latitude,
+          longitude: currentState.current.longitude,
+        };
+        if (
+          currentState.current.latitude &&
+          currentState.current.longitude &&
+          !currentState.throws.some(
+            x =>
+              x.latitude === _throw.latitude && x.longitude === _throw.longitude
+          )
+        ) {
+          state.update({
+            throws:
+              currentState.throws instanceof Array
+                ? [...currentState.throws, _throw]
+                : [_throw],
+          });
+        }
+      }
+
+      /**
        * Add "disabled"-attribute to the element for 750ms.
        */
       function disableBriefly(e) {
@@ -358,10 +466,10 @@
 
         if (state.get().unit === "feet") {
           state.update({ unit: "meter" });
-          btn.textContent = "feet";
+          btn.textContent = "use feet";
         } else {
           state.update({ unit: "feet" });
-          btn.textContent = "meter";
+          btn.textContent = "use meters";
         }
       }
 
@@ -375,28 +483,25 @@
         navigator.geolocation.watchPosition(updatePosition, error, options);
       }
 
+      state.init();
+
+      document
+        .querySelectorAll("button")
+        .forEach(button => button.addEventListener("click", disableBriefly));
+
       document
         .querySelector("#start-btn")
         .addEventListener("click", setStartPosition);
 
-      document
-        .querySelector("#start-btn")
-        .addEventListener("click", disableBriefly);
-
-      if (!state.get().unit) {
-        state.update({ unit: "meter" });
-      }
-
       document.querySelector("#unit-btn").textContent =
-        state.get().unit === "feet" ? "meter" : "feet";
+        state.get().unit === "feet" ? "use meters" : "use feet";
       document.querySelector("#unit-btn").addEventListener("click", toggleUnit);
 
       document
         .querySelector("#reset-btn")
-        .addEventListener("click", (e) => state.reset());
-      document
-        .querySelector("#reset-btn")
-        .addEventListener("click", disableBriefly);
+        .addEventListener("click", e => state.reset());
+
+      document.querySelector("#save-btn").addEventListener("click", saveThrow);
     </script>
   </body>
 </html>
