@@ -48,6 +48,42 @@
   </head>
 
   <body>
+    <button
+      type="button"
+      id="about-dialog-trigger"
+      class="top-right-corner circle"
+    >
+      ?
+    </button>
+    <dialog id="about-dialog">
+      <header>About</header>
+      <article>
+        <p>
+          This site is intended to be a quick and easy way to measure distance
+          for disc golf field work.
+        </p>
+        <p>
+          MyThrow.xyz uses your GPS to get the distance as accurate as possible.
+          It might take 30-60 seconds (or more) for the accuracy to go down to
+          usable levels. This is due to your phone looking for GPS satellites
+          and is nothing that can be fixed by a website.
+        </p>
+        <p>
+          Press "set start" to tell the app where you're throwing from. Go to
+          your disc and check the distance. If you press "save throw" your
+          current position will be saved and an average of all throws will be
+          calculated. To start over just press "reset all" or close this tab in
+          your browser. You can press "set start" multiple times, each time the
+          position will reset to your current location and all distances will be
+          recalculated.
+        </p>
+        <p>
+          Source code is available at
+          <a href="https://github.com/OskarKlintrot/MyThrow.xyz">github.com</a>.
+        </p>
+      </article>
+      <button type="button" autofocus>Close</button>
+    </dialog>
     <div id="app">
       <header>
         <h1>MyThrow.xyz</h1>
@@ -68,7 +104,43 @@
     <style type="text/css">
       body {
         font-size: 1.5em;
-        margin: 0; /* prevents scrollbars */
+        margin: 0 auto 0 auto; /* prevents scrollbars */
+      }
+
+      .top-right-corner {
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        top: 0.8rem;
+        right: 0.8rem;
+      }
+
+      .circle {
+        background: var(--background);
+        border-radius: 50%;
+        width: 2rem;
+        height: 2rem;
+        text-align: center;
+      }
+
+      #about-dialog {
+        padding: 10px 10px;
+      }
+
+      #about-dialog > article {
+        padding: 0 10px 0 10px;
+        max-height: 60vh;
+        overflow: auto;
+      }
+
+      #about-dialog p {
+        font-size: 1rem;
+      }
+
+      #about-dialog > button {
+        font-size: 1.3rem;
+        margin: auto 6px 6px auto;
+        display: block;
       }
 
       #app {
@@ -502,6 +574,20 @@
         .addEventListener("click", e => state.reset());
 
       document.querySelector("#save-btn").addEventListener("click", saveThrow);
+
+      const aboutDialog = document.querySelector("#about-dialog");
+
+      document
+        .querySelector("#about-dialog-trigger")
+        .addEventListener("click", () => {
+          aboutDialog.showModal();
+        });
+
+      document
+        .querySelector("#about-dialog button")
+        .addEventListener("click", () => {
+          aboutDialog.close();
+        });
     </script>
   </body>
 </html>
