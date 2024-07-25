@@ -560,14 +560,14 @@
       }
 
       /**
-       * Add "disabled"-attribute to the element for 1000ms.
+       * Add "disabled"-attribute to the element for 500ms.
        */
       function disableBriefly(e) {
         const element = e.srcElement;
         element.setAttribute("disabled", true);
         setTimeout(() => {
           element.removeAttribute("disabled");
-        }, 1000);
+        }, 500);
       }
 
       function toggleUnit(e) {
@@ -595,7 +595,7 @@
       state.init();
 
       document
-        .querySelectorAll("button")
+        .querySelectorAll("button:not(#unit-btn)")
         .forEach(button => button.addEventListener("click", disableBriefly));
 
       document
