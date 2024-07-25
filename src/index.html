@@ -66,7 +66,8 @@
           MyThrow.xyz uses your GPS to get the distance as accurate as possible.
           It might take 30-60 seconds (or more) for the accuracy to go down to
           usable levels. This is due to your phone looking for GPS satellites
-          and is nothing that can be fixed by a website.
+          and is nothing that can be fixed by a website. Buildings, clothing and
+          even a cloudy sky can all impact the accuracy of the GPS signal.
         </p>
         <p>
           Press "set start" to tell the app where you're throwing from. Go to
@@ -102,9 +103,21 @@
     </div>
 
     <style type="text/css">
+      html {
+        font-size: 1.3em;
+      }
+
       body {
-        font-size: 1.5em;
+        line-height: 1.3;
         margin: 0 auto 0 auto; /* prevents scrollbars */
+      }
+
+      h1 {
+        margin-bottom: 0;
+      }
+
+      p:has(span#distance) {
+        font-size: 1.5rem;
       }
 
       .top-right-corner {
