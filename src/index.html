@@ -99,7 +99,7 @@
         <button type="button" id="start-btn">set start</button>
         <button type="button" id="save-btn">save throw</button>
         <button type="button" id="reset-all-btn">reset all</button>
-        <button type="button" id="reset-throws-btn">reset throws</button>
+        <button type="button" id="clear-throws-btn">clear throws</button>
       </footer>
     </div>
 
@@ -553,7 +553,7 @@
       /**
        * Reset all throws
        */
-      function resetThrows() {
+      function clearThrows() {
         state.update({
           throws: [],
         });
@@ -607,8 +607,8 @@
       document.querySelector("#unit-btn").addEventListener("click", toggleUnit);
 
       document
-        .querySelector("#reset-throws-btn")
-        .addEventListener("click", resetThrows);
+        .querySelector("#clear-throws-btn")
+        .addEventListener("click", clearThrows);
 
       document
         .querySelector("#reset-all-btn")
