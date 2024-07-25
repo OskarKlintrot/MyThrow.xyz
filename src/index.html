@@ -97,7 +97,7 @@
       <footer>
         <button type="button" id="start-btn">set start</button>
         <button type="button" id="save-btn">save throw</button>
-        <button type="button" id="reset-btn">reset all</button>
+        <button type="button" id="reset-all-btn">reset all</button>
         <button type="button" id="unit-btn">...</button>
       </footer>
     </div>
@@ -584,7 +584,7 @@
       document.querySelector("#unit-btn").addEventListener("click", toggleUnit);
 
       document
-        .querySelector("#reset-btn")
+        .querySelector("#reset-all-btn")
         .addEventListener("click", e => state.reset());
 
       document.querySelector("#save-btn").addEventListener("click", saveThrow);
