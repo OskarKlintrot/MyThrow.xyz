@@ -95,10 +95,11 @@
         <div id="throws-statistics"></div>
       </main>
       <footer>
+        <button type="button" id="unit-btn">...</button>
         <button type="button" id="start-btn">set start</button>
         <button type="button" id="save-btn">save throw</button>
         <button type="button" id="reset-all-btn">reset all</button>
-        <button type="button" id="unit-btn">...</button>
+        <button type="button" id="reset-throws-btn">reset throws</button>
       </footer>
     </div>
 
@@ -196,6 +197,13 @@
         padding-right: 0.1rem;
         padding-left: 0.1rem;
       }
+
+      #unit-btn {
+        all: unset;
+        position: fixed;
+        bottom: 7.5rem;
+        right: 0.8rem;
+      }
     </style>
 
     <script src="/keep-screen-on.js" defer=""></script>
@@ -288,11 +296,17 @@
           const paths = [];
 
           for (const key in obj) {
-            const path = prefix ? `${prefix}.${key}` : key;
-            if (typeof obj[key] === "object" && obj[key] !== null) {
-              paths.push(...this._getPaths(obj[key], path));
-            } else {
-              paths.push(path);
+            if (obj.hasOwnProperty(key)) {
+              const path = prefix ? `${prefix}.${key}` : key;
+              if (
+                typeof obj[key] === "object" &&
+                obj[key] !== null &&
+                !Array.isArray(obj[key])
+              ) {
+                paths.push(...this._getPaths(obj[key], path));
+              } else {
+                paths.push(path);
+              }
             }
           }
 
@@ -309,7 +323,7 @@
           "current.*": [updateDistance],
           "tee.*": [updateDistance, updateThrows],
           unit: [updateAccuracy, updateDistance, updateThrows],
-          "throws.*": [updateThrows],
+          throws: [updateThrows],
         },
         _state: {
           unit: undefined,
@@ -537,6 +551,15 @@
       }
 
       /**
+       * Reset all throws
+       */
+      function resetThrows() {
+        state.update({
+          throws: [],
+        });
+      }
+
+      /**
        * Add "disabled"-attribute to the element for 1000ms.
        */
       function disableBriefly(e) {
@@ -582,6 +605,10 @@
       document.querySelector("#unit-btn").textContent =
         state.get().unit === "feet" ? "use meters" : "use feet";
       document.querySelector("#unit-btn").addEventListener("click", toggleUnit);
+
+      document
+        .querySelector("#reset-throws-btn")
+        .addEventListener("click", resetThrows);
 
       document
         .querySelector("#reset-all-btn")
