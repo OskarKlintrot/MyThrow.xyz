@@ -1,7 +1,6 @@
 {
   "id": "/",
   "name": "My Throw",
-  "short_name": "Throw",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f2f2f2",
