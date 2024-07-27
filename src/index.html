@@ -83,7 +83,13 @@
           <a href="https://github.com/OskarKlintrot/MyThrow.xyz">github.com</a>.
         </p>
       </article>
-      <button type="button" autofocus>close</button>
+      <hr />
+      <p>
+        If you like this little app, consider supporting it on
+        <a href="https://www.patreon.com/mythrow">patreon</a> or
+        <a href="https://buymeacoffee.com/oskarklintrot">buy me a coffee</a>.
+      </p>
+      <button type="button" autofocus>Close</button>
     </dialog>
     <div id="app">
       <header>
@@ -138,23 +144,29 @@
       }
 
       #about-dialog {
+        margin-left: 0.8rem;
+        margin-right: 0.8rem;
         padding: 10px 10px;
+        text-wrap: pretty;
+      }
+
+      #about-dialog > header:first-child {
+        margin: -10px -10px 10px; /* Must change together with #about-dialog padding */
       }
 
       #about-dialog > article {
-        padding: 0 10px 0 10px;
-        margin-bottom: 10px;
-        max-height: 60vh;
+        padding: 0 10px;
+        max-height: 55vh;
         overflow: auto;
-      }
-
-      #about-dialog p {
-        font-size: 1rem;
       }
 
       #about-dialog > button {
         margin: auto 6px 6px auto;
         display: block;
+      }
+
+      #about-dialog > p:has(~button) {
+        margin-bottom: 0;
       }
 
       #app {
