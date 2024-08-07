@@ -55,21 +55,6 @@
     >
       ?
     </button>
-    <dialog id="permission-dialog">
-      <header>Enable geolocation</header>
-      <article>
-        <p>
-          This site uses your browsers
-          <a
-            href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API"
-            >Geolocation API</a
-          >
-          in order to access your device GPS. Please give this site permission
-          to use your location by clicking to button below.
-        </p>
-      </article>
-      <button id="enable-gps-btn" type="button" autofocus>Enable GPS</button>
-    </dialog>
     <dialog id="about-dialog">
       <header>About</header>
       <article>
@@ -211,6 +196,11 @@
         margin-bottom: 0;
       }
 
+      #enable-geolocation-btn {
+        margin: auto 6px 6px auto;
+        display: block;
+      }
+
       #app {
         height: 100dvh;
 
@@ -277,7 +267,6 @@
       const distance = document.querySelector("#distance");
       const aboutDialog = document.querySelector("#about-dialog");
       const settingsDialog = document.querySelector("#settings-dialog");
-      const permissionDialog = document.querySelector("#permission-dialog");
 
       const state = {
         init() {
@@ -556,7 +545,7 @@
        * Error when retrieve the position
        */
       function error() {
-        status.textContent = "Unable to retrieve your location";
+        status.textContent = "Unable to retrieve your location.";
       }
 
       /**
@@ -647,9 +636,25 @@
           if (result.state === "granted") {
             startWatchingLocation();
           } else if (result.state === "prompt") {
-            permissionDialog.showModal();
+            const permissionDiv = document.createElement("div");
+
+            permissionDiv.innerHTML = `
+              <p>
+                For this site to work, it need to access your location.
+              </p>
+              <button id="enable-geolocation-btn" type="button" autofocus>Allow</button>
+              `;
+
+            permissionDiv
+              .querySelector("#enable-geolocation-btn")
+              .addEventListener("click", () => {
+                startWatchingLocation();
+                permissionDiv.remove();
+              });
+
+            document.querySelector("main").appendChild(permissionDiv);
           } else if (result.state === "denied") {
-            status.textContent = "Geolocation has been denied.";
+            status.textContent = "Access to location has been denied.";
           }
         });
       }
@@ -700,13 +705,6 @@
         .querySelector("#close-settings-dialog-btn")
         .addEventListener("click", () => {
           settingsDialog.close();
-        });
-
-      document
-        .querySelector("#enable-gps-btn")
-        .addEventListener("click", () => {
-          startWatchingLocation();
-          permissionDialog.close();
         });
     </script>
   </body>
