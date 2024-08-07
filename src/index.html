@@ -50,7 +50,7 @@
   <body>
     <button
       type="button"
-      id="about-dialog-trigger"
+      id="open-about-dialog-btn"
       class="top-right-corner circle"
     >
       ?
@@ -69,13 +69,14 @@
           and is nothing that can be fixed by a website. Buildings, clothing and
           even a cloudy sky can all impact the accuracy of the GPS signal.
         </p>
+        <p>Under "settings" you can toggle between feet and meters.</p>
         <p>
           Press "set start" to tell the app where you're throwing from. Go to
           your disc and check the distance. If you press "save throw" your
           current position will be saved and an average of all throws will be
-          calculated. To start over just press "reset all" or close this tab in
-          your browser. You can press "set start" multiple times, each time the
-          starting position will reset to your current location and all
+          calculated. To start over just press "clear throws" or close this tab
+          in your browser. You can press "set start" multiple times, each time
+          the starting position will reset to your current location and all
           distances will be recalculated.
         </p>
         <p>
@@ -91,6 +92,28 @@
       </p>
       <button type="button" autofocus>Close</button>
     </dialog>
+    <dialog id="settings-dialog">
+      <header>Settings</header>
+      <article>
+        <p>
+          Change unit between meters and feet.
+          <button type="button" id="unit-btn">...</button>
+        </p>
+        <p>
+          Reset app to it's original state.
+          <button type="button" id="reset-all-btn">reset all</button>
+        </p>
+      </article>
+      <hr />
+      <p>
+        If you like this little app, consider supporting it on
+        <a href="https://www.patreon.com/mythrow">patreon</a> or
+        <a href="https://buymeacoffee.com/oskarklintrot">buy me a coffee</a>.
+      </p>
+      <button id="close-settings-dialog-btn" type="button" autofocus>
+        Close
+      </button>
+    </dialog>
     <div id="app">
       <header>
         <h1>MyThrow.xyz</h1>
@@ -101,10 +124,9 @@
         <div id="throws-statistics"></div>
       </main>
       <footer>
-        <button type="button" id="unit-btn">...</button>
         <button type="button" id="start-btn">set start</button>
         <button type="button" id="save-btn">save throw</button>
-        <button type="button" id="reset-all-btn">reset all</button>
+        <button type="button" id="open-settings-dialog-btn">settings</button>
         <button type="button" id="clear-throws-btn">clear throws</button>
       </footer>
     </div>
@@ -143,29 +165,34 @@
         text-align: center;
       }
 
-      #about-dialog {
+      dialog {
         margin-left: 0.8rem;
         margin-right: 0.8rem;
         padding: 10px 10px;
         text-wrap: pretty;
       }
 
-      #about-dialog > header:first-child {
-        margin: -10px -10px 10px; /* Must change together with #about-dialog padding */
+      dialog > header:first-child {
+        margin: -10px -10px 10px; /* Must change together with dialog padding */
       }
 
-      #about-dialog > article {
+      dialog > article {
         padding: 0 10px;
         max-height: 55dvh;
         overflow: auto;
       }
 
-      #about-dialog > button {
+      dialog article p > button {
+        margin-top: 6px;
+        display: block;
+      }
+
+      dialog > button {
         margin: auto 6px 6px auto;
         display: block;
       }
 
-      #about-dialog > p:has(~button) {
+      dialog > p:has(~ button) {
         margin-bottom: 0;
       }
 
@@ -207,13 +234,6 @@
       footer > button {
         padding-right: 0.1rem;
         padding-left: 0.1rem;
-      }
-
-      #unit-btn {
-        all: unset;
-        position: absolute;
-        bottom: 7.3rem;
-        right: 0.8rem;
       }
     </style>
 
@@ -586,10 +606,10 @@
 
         if (state.get().unit === "feet") {
           state.update({ unit: "meter" });
-          btn.textContent = "use feet";
+          btn.textContent = "meter";
         } else {
           state.update({ unit: "feet" });
-          btn.textContent = "use meters";
+          btn.textContent = "feet";
         }
       }
 
@@ -614,7 +634,7 @@
         .addEventListener("click", setStartPosition);
 
       document.querySelector("#unit-btn").textContent =
-        state.get().unit === "feet" ? "use meters" : "use feet";
+        state.get().unit === "feet" ? "feet" : "meter";
       document.querySelector("#unit-btn").addEventListener("click", toggleUnit);
 
       document
@@ -630,7 +650,7 @@
       const aboutDialog = document.querySelector("#about-dialog");
 
       document
-        .querySelector("#about-dialog-trigger")
+        .querySelector("#open-about-dialog-btn")
         .addEventListener("click", () => {
           aboutDialog.showModal();
         });
@@ -639,6 +659,20 @@
         .querySelector("#about-dialog button")
         .addEventListener("click", () => {
           aboutDialog.close();
+        });
+
+      const settingsDialog = document.querySelector("#settings-dialog");
+
+      document
+        .querySelector("#open-settings-dialog-btn")
+        .addEventListener("click", () => {
+          settingsDialog.showModal();
+        });
+
+      document
+        .querySelector("#close-settings-dialog-btn")
+        .addEventListener("click", () => {
+          settingsDialog.close();
         });
     </script>
   </body>
