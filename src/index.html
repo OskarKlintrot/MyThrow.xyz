@@ -55,6 +55,21 @@
     >
       ?
     </button>
+    <dialog id="permission-dialog">
+      <header>Enable geolocation</header>
+      <article>
+        <p>
+          This site uses your browsers
+          <a
+            href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API"
+            >Geolocation API</a
+          >
+          in order to access your device GPS. Please give this site permission
+          to use your location by clicking to button below.
+        </p>
+      </article>
+      <button id="enable-gps-btn" type="button" autofocus>Enable GPS</button>
+    </dialog>
     <dialog id="about-dialog">
       <header>About</header>
       <article>
@@ -260,6 +275,10 @@
       const status = document.querySelector("#status");
       const accuracy = document.querySelector("#accuracy");
       const distance = document.querySelector("#distance");
+      const aboutDialog = document.querySelector("#about-dialog");
+      const settingsDialog = document.querySelector("#settings-dialog");
+      const permissionDialog = document.querySelector("#permission-dialog");
+
       const state = {
         init() {
           const lat = sessionStorage.getItem("tee-latitude");
@@ -613,14 +632,26 @@
         }
       }
 
-      if (!navigator.geolocation) {
-        status.textContent = "Geolocation is not supported by your browser.";
-      } else {
+      function startWatchingLocation() {
         status.textContent = "Locating…";
         const options = {
           enableHighAccuracy: true,
         };
         navigator.geolocation.watchPosition(updatePosition, error, options);
+      }
+
+      if (!navigator.geolocation) {
+        status.textContent = "Geolocation is not supported by your browser.";
+      } else {
+        navigator.permissions.query({ name: "geolocation" }).then(result => {
+          if (result.state === "granted") {
+            startWatchingLocation();
+          } else if (result.state === "prompt") {
+            permissionDialog.showModal();
+          } else if (result.state === "denied") {
+            status.textContent = "Geolocation has been denied.";
+          }
+        });
       }
 
       state.init();
@@ -647,8 +678,6 @@
 
       document.querySelector("#save-btn").addEventListener("click", saveThrow);
 
-      const aboutDialog = document.querySelector("#about-dialog");
-
       document
         .querySelector("#open-about-dialog-btn")
         .addEventListener("click", () => {
@@ -661,8 +690,6 @@
           aboutDialog.close();
         });
 
-      const settingsDialog = document.querySelector("#settings-dialog");
-
       document
         .querySelector("#open-settings-dialog-btn")
         .addEventListener("click", () => {
@@ -673,6 +700,13 @@
         .querySelector("#close-settings-dialog-btn")
         .addEventListener("click", () => {
           settingsDialog.close();
+        });
+
+      document
+        .querySelector("#enable-gps-btn")
+        .addEventListener("click", () => {
+          startWatchingLocation();
+          permissionDialog.close();
         });
     </script>
   </body>
