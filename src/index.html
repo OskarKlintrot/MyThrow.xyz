@@ -329,10 +329,10 @@
             localStorage.setItem("unit", changes.unit);
           }
 
-          this._getPaths(changes).forEach(path => {
+          this._getPaths(changes).forEach((path) => {
             for (const pattern in this._observers) {
               if (this._matchPath(pattern, path)) {
-                this._observers[pattern].forEach(listener => {
+                this._observers[pattern].forEach((listener) => {
                   listener(this.get());
                 });
               }
@@ -514,7 +514,7 @@
         }
 
         if (state.tee.latitude && state.tee.longitude) {
-          const distances = state.throws.map(t =>
+          const distances = state.throws.map((t) =>
             getDistanceBetween(
               {
                 latitude: state.tee.latitude,
@@ -536,13 +536,13 @@
           const ol = document.createElement("ol");
 
           distances
-            .map(d => getDistanceWithPreferredUnit(d))
-            .map(s => {
+            .map((d) => getDistanceWithPreferredUnit(d))
+            .map((s) => {
               const li = document.createElement("li");
               li.textContent = s;
               return li;
             })
-            .forEach(t => ol.appendChild(t));
+            .forEach((t) => ol.appendChild(t));
 
           const p = document.createElement("p");
           p.textContent = `Average: ${getDistanceWithPreferredUnit(average)}`;
@@ -609,7 +609,7 @@
           currentState.current.latitude &&
           currentState.current.longitude &&
           !currentState.throws.some(
-            x =>
+            (x) =>
               x.latitude === _throw.latitude && x.longitude === _throw.longitude
           )
         ) {
@@ -665,7 +665,7 @@
       if (!navigator.geolocation) {
         status.textContent = "Geolocation is not supported by your browser.";
       } else {
-        navigator.permissions.query({ name: "geolocation" }).then(result => {
+        navigator.permissions.query({ name: "geolocation" }).then((result) => {
           if (result.state === "granted") {
             startWatchingLocation();
           } else if (result.state === "prompt") {
@@ -696,7 +696,7 @@
 
       document
         .querySelectorAll("button:not(#unit-btn)")
-        .forEach(button => button.addEventListener("click", disableBriefly));
+        .forEach((button) => button.addEventListener("click", disableBriefly));
 
       document
         .querySelector("#start-btn")
@@ -712,7 +712,7 @@
 
       document
         .querySelector("#reset-all-btn")
-        .addEventListener("click", e => state.reset());
+        .addEventListener("click", (e) => state.reset());
 
       document.querySelector("#save-btn").addEventListener("click", saveThrow);
 
