@@ -53,13 +53,6 @@
   </head>
 
   <body>
-    <button
-      type="button"
-      id="open-about-dialog-btn"
-      class="top-right-corner circle"
-    >
-      ?
-    </button>
     <dialog id="about-dialog">
       <header>About</header>
       <article>
@@ -122,6 +115,13 @@
     <div id="app">
       <header>
         <h1>MyThrow.xyz</h1>
+        <button
+          type="button"
+          id="open-about-dialog-btn"
+          class="top-right-corner circle"
+        >
+          ?
+        </button>
       </header>
       <main>
         <p>Distance: <span id="distance">–</span></p>
@@ -160,6 +160,11 @@
         padding: 0;
         top: 0.8rem;
         right: 0.8rem;
+      }
+
+      #app > header {
+        grid-area: header;
+        position: relative;
       }
 
       .circle {
@@ -215,10 +220,6 @@
           "header"
           "main"
           "footer";
-      }
-
-      #app > header {
-        grid-area: header;
       }
 
       #app > main {
