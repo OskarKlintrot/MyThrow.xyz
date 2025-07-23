@@ -144,6 +144,10 @@
       body {
         line-height: 1.3;
         margin: 0 auto 0 auto; /* prevents scrollbars */
+        /* Override water.css default margin to fix footer positioning in PWA */
+        margin: 0 !important;
+        max-width: none !important;
+        padding: 0 !important;
       }
 
       h1 {
@@ -206,6 +210,10 @@
 
       #app {
         height: 100dvh;
+        /* Add max-width and padding back to the app container to preserve layout */
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 10px;
 
         /* grid container settings */
         display: grid;
@@ -220,6 +228,8 @@
       #app > header {
         grid-area: header;
         position: relative;
+        /* Add padding in portrait mode */
+        padding: 0 10px;
       }
 
       #app > main {
@@ -230,6 +240,8 @@
 
       #app > footer {
         grid-area: footer;
+        /* Add padding in portrait mode */
+        padding: 0 10px 1rem 10px;
       }
 
       footer {
@@ -253,11 +265,20 @@
           grid-template-areas:
             "header footer"
             "main footer";
+          /* Ensure app still takes full viewport in landscape */
+          max-width: none;
+          padding: 0;
         }
 
         #app > footer {
           grid-area: footer;
+          /* Add padding back in landscape mode */
           padding: 1rem;
+        }
+
+        #app > main {
+          /* Add padding back in landscape mode for content */
+          padding: 0 1rem;
         }
 
         #app > footer {
@@ -267,6 +288,8 @@
           width: 150px;
           min-width: 150px;
           border: none;
+          /* Add padding back in landscape mode */
+          padding: 1rem;
         }
 
         footer > button {
