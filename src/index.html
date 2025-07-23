@@ -53,13 +53,6 @@
   </head>
 
   <body>
-    <button
-      type="button"
-      id="open-about-dialog-btn"
-      class="top-right-corner circle"
-    >
-      ?
-    </button>
     <dialog id="about-dialog">
       <header>About</header>
       <article>
@@ -122,6 +115,13 @@
     <div id="app">
       <header>
         <h1>MyThrow.xyz</h1>
+        <button
+          type="button"
+          id="open-about-dialog-btn"
+          class="top-right-corner circle"
+        >
+          ?
+        </button>
       </header>
       <main>
         <p>Distance: <span id="distance">–</span></p>
@@ -219,6 +219,7 @@
 
       #app > header {
         grid-area: header;
+        position: relative;
       }
 
       #app > main {
@@ -242,6 +243,36 @@
       footer > button {
         padding-right: 0.1rem;
         padding-left: 0.1rem;
+      }
+
+      /* Landscape mode layout */
+      @media (orientation: landscape) {
+        #app {
+          grid-template-columns: 1fr auto;
+          grid-template-rows: auto 1fr;
+          grid-template-areas:
+            "header footer"
+            "main footer";
+        }
+
+        #app > footer {
+          grid-area: footer;
+          padding: 1rem;
+        }
+
+        #app > footer {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          width: 150px;
+          min-width: 150px;
+          border: none;
+        }
+
+        footer > button {
+          padding: 0.8rem 0.5rem;
+          white-space: nowrap;
+        }
       }
     </style>
 
@@ -299,10 +330,10 @@
             localStorage.setItem("unit", changes.unit);
           }
 
-          this._getPaths(changes).forEach(path => {
+          this._getPaths(changes).forEach((path) => {
             for (const pattern in this._observers) {
               if (this._matchPath(pattern, path)) {
-                this._observers[pattern].forEach(listener => {
+                this._observers[pattern].forEach((listener) => {
                   listener(this.get());
                 });
               }
@@ -484,7 +515,7 @@
         }
 
         if (state.tee.latitude && state.tee.longitude) {
-          const distances = state.throws.map(t =>
+          const distances = state.throws.map((t) =>
             getDistanceBetween(
               {
                 latitude: state.tee.latitude,
@@ -506,13 +537,13 @@
           const ol = document.createElement("ol");
 
           distances
-            .map(d => getDistanceWithPreferredUnit(d))
-            .map(s => {
+            .map((d) => getDistanceWithPreferredUnit(d))
+            .map((s) => {
               const li = document.createElement("li");
               li.textContent = s;
               return li;
             })
-            .forEach(t => ol.appendChild(t));
+            .forEach((t) => ol.appendChild(t));
 
           const p = document.createElement("p");
           p.textContent = `Average: ${getDistanceWithPreferredUnit(average)}`;
@@ -579,7 +610,7 @@
           currentState.current.latitude &&
           currentState.current.longitude &&
           !currentState.throws.some(
-            x =>
+            (x) =>
               x.latitude === _throw.latitude && x.longitude === _throw.longitude
           )
         ) {
@@ -635,7 +666,7 @@
       if (!navigator.geolocation) {
         status.textContent = "Geolocation is not supported by your browser.";
       } else {
-        navigator.permissions.query({ name: "geolocation" }).then(result => {
+        navigator.permissions.query({ name: "geolocation" }).then((result) => {
           if (result.state === "granted") {
             startWatchingLocation();
           } else if (result.state === "prompt") {
@@ -666,7 +697,7 @@
 
       document
         .querySelectorAll("button:not(#unit-btn)")
-        .forEach(button => button.addEventListener("click", disableBriefly));
+        .forEach((button) => button.addEventListener("click", disableBriefly));
 
       document
         .querySelector("#start-btn")
@@ -682,7 +713,7 @@
 
       document
         .querySelector("#reset-all-btn")
-        .addEventListener("click", e => state.reset());
+        .addEventListener("click", (e) => state.reset());
 
       document.querySelector("#save-btn").addEventListener("click", saveThrow);
 
